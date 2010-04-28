@@ -7,6 +7,6 @@ package org.jteca.core;
  * @author packyuser
  *
  */
-public class Movie extends Resource {
+public class Audio extends Resource {
 
 }
