@@ -19,7 +19,7 @@ package org.jteca.core;
  * @author packyuser
  *
  */
-public abstract class Resource {
+abstract class Resource {
     private String name, playbill, notes;
     private ResourceType type;
     /** Restituisce il nome
