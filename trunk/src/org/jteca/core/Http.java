@@ -47,9 +47,7 @@ public class Http {
                 CookiePolicy.BROWSER_COMPATIBILITY);
     }
 
-    private void queryTitle() throws ClientProtocolException, IOException{
-        String url = "http://www.imdb.it/find?s=tt&q=";
-        String query = "principe di persia";
+    private void queryTitle(String url, String query) throws ClientProtocolException, IOException{
         String newUrl = url+query.replaceAll(" ", "+");
         String result = " <p><b>Titoli popolari</b>";
 
@@ -69,6 +67,9 @@ public class Http {
         while ((line = br.readLine()) != null) {            
             if (line.length()>len && line.substring(0, len).equalsIgnoreCase(result)){
                 System.out.println(line);
+                String[] array = line.split("<td");
+                for (int x=0; x<array.length; x++)
+                    System.out.println(array[x]);
                 break;
             }
         }
@@ -79,8 +80,10 @@ public class Http {
 
     public static void main(String args[]){
         Http h = new Http();
+        String url = "http://www.imdb.it/find?s=tt&q=";
+        String query = "principe di persia";
         try {
-            h.queryTitle();
+            h.queryTitle(url, query);
 
         } catch (ClientProtocolException ex) {
             ex.printStackTrace();
