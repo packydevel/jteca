@@ -47,9 +47,14 @@ public class Http {
                 CookiePolicy.BROWSER_COMPATIBILITY);
     }
 
-    private void queryTitle(String url, String query) throws ClientProtocolException, IOException{
-        String newUrl = url+query.replaceAll(" ", "+");
-        String result = " <p><b>Titoli popolari</b>";
+    private void queryTitle(String url, String query)
+            throws ClientProtocolException, IOException{        
+        String title_popular = " <p><b>Titoli popolari</b>";
+        String title_approx = " <p><b>Titoli  (risultati approssimati)</b>";
+        String table_begin = "<table>";
+        String table_end = "</table>";
+        String table_tr_begin = "<tr>";
+        String a_href = "<a href=\"";
 
         get = new HttpGet(url);
         response = client.execute(get);
@@ -58,33 +63,44 @@ public class Http {
         if (entity!=null)
             entity.consumeContent();
         
+        String newUrl = url+query.replaceAll(" ", "+");
         get = new HttpGet(newUrl);
         response = client.execute(get);
         entity = response.getEntity();
         BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
         String line;
-        int len = result.length();
+        int len = title_popular.length();
+        boolean found_popular = false;
         while ((line = br.readLine()) != null) {            
-            if (line.length()>len && line.substring(0, len).equalsIgnoreCase(result)){
-                System.out.println(line);
-                String[] array = line.split("<td");
-                for (int x=0; x<array.length; x++)
-                    System.out.println(array[x]);
+            if (line.length()>len &&
+                    line.substring(0, len).equalsIgnoreCase(title_popular)){
+                found_popular = true;
                 break;
             }
         }
-        if (line!=null){
-
+        if (found_popular){
+            String[] array = line.split(table_begin);
+            array = array[1].split(table_end);
+            array = array[0].split(table_tr_begin);
+            for (int i=1; i<array.length; i++){
+                String[] array_single = array[i].split("<td ");
+                array_single = array_single[array_single.length-1].split(a_href);
+                String temp = array_single[1];
+                String link = temp.split("\"")[0];
+                System.out.println(link);
+                array_single = temp.split("\">");
+                String name = array_single[1].split("</a>")[0];
+                System.out.println(name);
+            }
         }
     } //end queryTitle
 
-    public static void main(String args[]){
-        Http h = new Http();
+    public static void main(String args[]){        
         String url = "http://www.imdb.it/find?s=tt&q=";
-        String query = "principe di persia";
+        String query = "arma letale";
         try {
-            h.queryTitle(url, query);
-
+            Http h = new Http();
+            h.queryTitle(url, query);            
         } catch (ClientProtocolException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
