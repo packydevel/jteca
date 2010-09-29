@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.apache.http.client.ClientProtocolException;
+import org.jfacility.lang.Lang;
+import org.jteca.core.Video;
 /**
  *
  * @author luca
@@ -54,25 +56,70 @@ public class Imdb extends AbstractHttp{
     private void captureInfo(URL u, ArrayList<String[]> items) throws IOException{
         String url = "http://" + u.getHost();
         String poster = "<a name=\"poster\" href=\"";
+        String regista = "        <h5>Regista:</h5>";
+        String data = "<h5>Data di uscita:</h5>";
+        String genere = "<h5>Genere:</h5>";
+        String trama = "<h5>Trama:</h5>";
+        String cast = "<hr/><div class=\"info\">  <div class=\"headerinline\"><h3>Cast</h3>";
+        String dettagli = "<hr />      <h3>Dettagli aggiuntivi</h3>";
 
         for (int i=0; i<items.size(); i++){
+            boolean[] founds = {false, false, false, false, false, false, false, false};
+            Video v = new Video();
             BufferedReader br = getEntityContent(url+items.get(i)[1]);
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.length()>tag_titleB.length() &&
+                if (!founds[0] && line.length()>tag_titleB.length() &&
                     line.substring(0, tag_titleB.length()).equalsIgnoreCase(tag_titleB)){
-                    System.out.println(line);
-                } else if (line.length()>poster.length() &&
+                    founds[0] = true;
+                    v.setName(line.split(tag_titleB)[1].split(tag_titleE)[0]);
+                } else if (!founds[1] && line.length()>=poster.length() &&
                     line.substring(0, poster.length()).equalsIgnoreCase(poster)){
+                    founds[1] = true;
+                    v.setPlaybill(url + line.split(poster)[1].split("\"")[0]);
+                } else if (!founds[2] && line.equalsIgnoreCase(regista)){
+                    founds[2] = true;
+                    line = jumpRows(6, br);
+                    System.out.println(line.split(">")[1].split("<")[0]);
+                } else if (!founds[3] && line.equalsIgnoreCase(data)){
+                    founds[3] = true;
+                    line = jumpRows(2, br);
+                    v.setYear(Lang.stringToInt(line.split(" ")[2]));
+                } else if (!founds[4] && line.equalsIgnoreCase(genere)){
+                    founds[4] = true;
+                    line = jumpRows(2, br);
                     System.out.println(line);
-                } 
-                //System.out.println(line);
-            }
+                } else if (!founds[5] && line.equalsIgnoreCase(trama)){
+                    String temp = "<a class=\"tn15more inline\" href=\"";
+                    founds[5] = true;
+                    line = jumpRows(3, br);
+                    if (line.substring(0, temp.length()).equals(temp))
+                        v.setPlot(url + line.split(temp)[1].split("\"")[0]);
+                } else if (!founds[6] && line.length()>=cast.length() &&
+                    line.substring(0, cast.length()).equalsIgnoreCase(cast)){
+                    founds[6] = true;
+                    System.out.println(line);
+                } else if (!founds[7] && line.length()>=dettagli.length() &&
+                    line.substring(0, dettagli.length()).equalsIgnoreCase(dettagli)){
+                    founds[7] = true;
+                    System.out.println(line);
+                    break;
+                }
+            } // end while
+            System.out.println(v.getPlaybill());
+            System.out.println(v.getPlot());
         }
-    }    
+    }
+
+    private String jumpRows(int i, BufferedReader br) throws IOException{
+        String line=null;
+        for (int j=0; j<i; j++)
+            line = br.readLine();
+        return line;
+    }
 
     public static void main(String args[]){
-        String query = "principe di persia";        
+        String query = "arma letale";
         try {
             URL u = new URL("http://www.imdb.it/find?s=tt&q=");
             Imdb h = new Imdb();
