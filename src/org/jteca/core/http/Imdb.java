@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.apache.http.client.ClientProtocolException;
+
 import org.jfacility.lang.Lang;
 import org.jteca.core.Video;
 /**
@@ -14,7 +15,7 @@ import org.jteca.core.Video;
  * @author luca
  */
 public class Imdb extends AbstractHttp{
-    private ArrayList<String[]> queryTitle(URL u, String query)
+    ArrayList<String[]> queryTitle(URL u, String query)
             throws ClientProtocolException, IOException{
         String title_popular = " <p><b>Titoli popolari</b>";
         String title_approx = " <p><b>Titoli  (risultati approssimati)</b>";        
@@ -28,7 +29,7 @@ public class Imdb extends AbstractHttp{
         String line;
         int len = title_popular.length();
         boolean found_popular = false;
-        while ((line = br.readLine()) != null) {            
+        while ((line = br.readLine()) != null) {
             if (line.length()>len &&
                     line.substring(0, len).equalsIgnoreCase(title_popular)){
                 found_popular = true;
@@ -109,14 +110,7 @@ public class Imdb extends AbstractHttp{
             System.out.println(v.getPlaybill());
             System.out.println(v.getPlot());
         }
-    }
-
-    private String jumpRows(int i, BufferedReader br) throws IOException{
-        String line=null;
-        for (int j=0; j<i; j++)
-            line = br.readLine();
-        return line;
-    }
+    }    
 
     public static void main(String args[]){
         String query = "arma letale";

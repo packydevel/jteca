@@ -3,7 +3,10 @@ package org.jteca.core.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
@@ -43,10 +46,20 @@ abstract class AbstractHttp {
                 CookiePolicy.BROWSER_COMPATIBILITY);
     }
 
-    BufferedReader getEntityContent(String url) throws IOException{
+    protected BufferedReader getEntityContent(String url) throws IOException{
         if (entity!=null)
             entity.consumeContent();
         entity = client.execute(new HttpGet(url)).getEntity();
         return new BufferedReader(new InputStreamReader(entity.getContent()));
     }
+
+    protected String jumpRows(int i, BufferedReader br) throws IOException{
+        String line=null;
+        for (int j=0; j<i; j++)
+            line = br.readLine();
+        return line;
+    }
+
+    abstract ArrayList<String[]> queryTitle(URL u, String query)
+            throws ClientProtocolException, IOException;
 }
