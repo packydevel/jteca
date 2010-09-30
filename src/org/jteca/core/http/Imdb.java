@@ -15,6 +15,15 @@ import org.jteca.core.Video;
  * @author luca
  */
 public class Imdb extends AbstractHttp{
+
+    public Imdb() {
+        super();
+    }
+
+    public Imdb(int timeout) {
+        super(timeout);
+    }
+    @Override
     ArrayList<String[]> queryTitle(URL u, String query)
             throws ClientProtocolException, IOException{
         String title_popular = " <p><b>Titoli popolari</b>";
