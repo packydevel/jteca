@@ -1,4 +1,8 @@
 package org.jteca.core;
+
+import java.util.ArrayList;
+
+import org.jteca.core.http.Cast;
 /**
  * @author packyuser
  *
@@ -6,6 +10,7 @@ package org.jteca.core;
 public class Video extends Resource {
     private String originalTitle, plot, format, support, country, languages, subtitles;
     private int lenght, year;
+    private ArrayList<Cast> cast;
     /**restituisce la nazione
      *
      * @return
@@ -104,5 +109,13 @@ public class Video extends Resource {
 
     public void setSubtitles(String subtitles) {
         this.subtitles = subtitles;
+    }
+
+    public ArrayList<Cast> getCast() {
+        return cast;
+    }
+
+    public void setCast(ArrayList<Cast> cast) {
+        this.cast = cast;
     }
 }

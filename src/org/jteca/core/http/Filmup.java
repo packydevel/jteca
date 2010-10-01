@@ -81,6 +81,7 @@ public class Filmup extends AbstractHttp{
         String cast = base.replaceAll("\">", "\">Cast");
         String plot = "<font face=\"arial, helvetica\" size=\"2\">Trama:<br>";
         String playbill = "<font face=\"tahoma, arial, helvetica\" size=\"1\" color=\"#ffffff\"><b>La locandina</b></font><br>";
+        String newUrl = u.getProtocol() + "://" + u.getHost();
 
         for (int i=0; i<items.size(); i++){
             boolean[] founds = {false, false, false, false, false, false, false, false, false, false};
@@ -136,12 +137,19 @@ public class Filmup extends AbstractHttp{
                     line.substring(0, playbill.length()).equalsIgnoreCase(playbill)){
                     founds[9] = true;
                     line = jumpRows(8, br);
-                    System.out.println(line.split("href=\"")[1].split("\"")[0]);
+                    v.setPlaybill(newUrl+ "/"+ line.split("href=\"")[1].split("\"")[0]);
                     break;
                 }
             }
-            System.out.println(v.getPlaybill());
-        }
+            br = getEntityContent(v.getPlaybill());
+            while ((line = br.readLine()) != null) {
+                if (line.equalsIgnoreCase("<!-- POSTER / START -->")){
+                    line = jumpRows(6, br);
+                    v.setPlaybill(newUrl + line.split("\"")[1]);
+                    break;
+                }
+            }
+        } //end for
     }
     
     public static void main(String args[]){
