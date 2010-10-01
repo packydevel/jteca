@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+
 import org.apache.http.client.ClientProtocolException;
+
 import org.jfacility.lang.Lang;
+import org.jteca.core.Video;
 
 /**
  *
@@ -64,15 +67,91 @@ public class Filmup extends AbstractHttp{
         }
         return results;
     }
+
+    private void captureInfo(URL u, ArrayList<String[]> items) throws IOException {
+        String title = "<font face=\"arial, helvetica\" size=\"3\"><b>";
+        String base = "<td valign=\"top\" nowrap><font face=\"arial, helvetica\" size=\"2\">:&nbsp;</font></td>";
+        String original = base.replaceAll("\">", "\">Titolo originale");
+        String removefont = "<td valign=\"top\"><font face=\"arial, helvetica\" size=\"2\">";
+        String country = base.replaceAll("\">", "\">Nazione");
+        String year = base.replaceAll("\">", "\">Anno");
+        String genere = base.replaceAll("\">", "\">Genere");
+        String time = base.replaceAll("\">", "\">Durata");
+        String director = base.replaceAll("\">", "\">Regia");
+        String cast = base.replaceAll("\">", "\">Cast");
+        String plot = "<font face=\"arial, helvetica\" size=\"2\">Trama:<br>";
+        String playbill = "<font face=\"tahoma, arial, helvetica\" size=\"1\" color=\"#ffffff\"><b>La locandina</b></font><br>";
+
+        for (int i=0; i<items.size(); i++){
+            boolean[] founds = {false, false, false, false, false, false, false, false, false, false};
+            Video v = new Video();
+            BufferedReader br = getEntityContent(items.get(i)[1]);
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!founds[0] && line.length()>title.length() &&
+                    line.substring(0, title.length()).equalsIgnoreCase(title)){
+                    founds[0] = true;
+                    v.setName(line.split(title)[1].split("</b>")[0]);
+                } else if (!founds[1] && line.length()>=original.length() &&
+                    line.substring(0, original.length()).equalsIgnoreCase(original)){
+                    founds[1] = true;
+                    line = jumpRows(1, br);
+                    v.setOriginalTitle(line.split(removefont)[1].split("</font>")[0]);                    
+                } else if (!founds[2] && line.length()>=country.length() &&
+                    line.substring(0, country.length()).equalsIgnoreCase(country)){
+                    founds[2] = true;
+                    line = jumpRows(1, br);
+                    v.setCountry(line.split(removefont)[1].split("</font>")[0]);
+                } else if (!founds[3] && line.length()>=year.length() &&
+                    line.substring(0, year.length()).equalsIgnoreCase(year)){
+                    founds[3] = true;
+                    line = jumpRows(1, br);
+                    v.setYear(Lang.stringToInt(line.split(removefont)[1].split("</font>")[0]));
+                } else if (!founds[4] && line.length()>=genere.length() &&
+                    line.substring(0, genere.length()).equalsIgnoreCase(genere)){
+                    founds[4] = true;
+                    line = jumpRows(1, br);
+                    System.out.println(line.split(removefont)[1].split("</font>")[0]);
+                } else if (!founds[5] && line.length()>=time.length() &&
+                    line.substring(0, time.length()).equalsIgnoreCase(time)){
+                    founds[5] = true;
+                    line = jumpRows(1, br);
+                    String temp = line.split(removefont)[1].split("</font>")[0];
+                    v.setLenght(Lang.stringToInt(temp.substring(0,temp.length()-1)));
+                } else if (!founds[6] && line.length()>=director.length() &&
+                    line.substring(0, director.length()).equalsIgnoreCase(director)){
+                    founds[6] = true;
+                    line = jumpRows(1, br);
+                    System.out.println(line.split(removefont)[1].split("</font>")[0]);
+                } else if (!founds[7] && line.length()>=cast.length() &&
+                    line.substring(0, cast.length()).equalsIgnoreCase(cast)){
+                    founds[7] = true;
+                    line = jumpRows(1, br);
+                    System.out.println(line.split(removefont)[1].split("</font>")[0]);
+                } else if (!founds[8] && line.length()>=plot.length() &&
+                    line.substring(0, plot.length()).equalsIgnoreCase(plot)){
+                    founds[8] = true;
+                    v.setPlot(line.split(plot)[1].split("</font>")[0]);
+                } else if (!founds[9] && line.length()>=playbill.length() &&
+                    line.substring(0, playbill.length()).equalsIgnoreCase(playbill)){
+                    founds[9] = true;
+                    line = jumpRows(8, br);
+                    System.out.println(line.split("href=\"")[1].split("\"")[0]);
+                    break;
+                }
+            }
+            System.out.println(v.getPlaybill());
+        }
+    }
     
     public static void main(String args[]){
-        //String query = "principe di persia";
-        String query = "arma letale";
+        String query = "principe di persia";
+        //String query = "arma letale";
         try {
             URL u = new URL(urlAll);
             Filmup h = new Filmup();
             ArrayList<String[]> results = h.queryTitle(u, query);
-            //h.captureInfo(u, results);
+            h.captureInfo(u, results);
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         } catch (ClientProtocolException ex) {

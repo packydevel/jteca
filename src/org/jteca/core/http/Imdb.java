@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.apache.http.client.ClientProtocolException;
 
 import org.jfacility.lang.Lang;
+
 import org.jteca.core.Video;
 /**
  *
@@ -122,7 +123,8 @@ public class Imdb extends AbstractHttp{
     }    
 
     public static void main(String args[]){
-        String query = "arma letale";
+        String query = "principe di persia";
+        //String query = "arma letale";
         try {
             URL u = new URL("http://www.imdb.it/find?s=tt&q=");
             Imdb h = new Imdb();
