@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import org.apache.http.client.ClientProtocolException;
 
-import org.jfacility.lang.Lang;
+import org.jfacility.java.lang.Lang;
 import org.jteca.core.Video;
 
 /**
